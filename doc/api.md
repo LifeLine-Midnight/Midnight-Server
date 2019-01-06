@@ -190,7 +190,7 @@ data.base_info.conjunction_msg_type 的值，共有好多种返回值
     "data": {
         "base_info": {
             "sid": 1,
-            "conjunction_msg_type": 5
+            "conjunction_msg_type": 6
         },
         "conjunction_info": null
     }
