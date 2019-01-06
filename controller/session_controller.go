@@ -2,6 +2,7 @@ package controller
 
 import (
 	"midgo/httpsvr"
+	"midnightapisvr/comm"
 	"midnightapisvr/service"
 )
 
@@ -9,10 +10,17 @@ import (
 type SessionController struct{}
 
 // UserLogIn 用户登录
+// [POST] /midnightapisvr/api/session/userlogin
+// {
+//     username: "guest123",
+//     password: "guest123#"
+// }
 func (*SessionController) UserLogIn(c *httpsvr.Req) *httpsvr.Resp {
-	c.ParseForm()
-	username := c.FormValue("username")
-	password := c.FormValue("password")
+	var req = new(comm.UserLogInReq)
+	httpsvr.JsonBodyDecode(c, req)
+
+	var username = req.Username
+	var password = req.Password
 
 	var ret = new(httpsvr.Resp)
 	if len(username) == 0 || len(password) == 0 {
@@ -36,9 +44,14 @@ func (*SessionController) UserLogIn(c *httpsvr.Req) *httpsvr.Resp {
 }
 
 // UserLogOut 用户登出
+// [POST] /midnightapisvr/api/session/userlogout
+// {
+//     token: "xxx"
+// }
 func (*SessionController) UserLogOut(c *httpsvr.Req) *httpsvr.Resp {
-	c.ParseForm()
-	token := c.FormValue("token")
+	var req = new(comm.UserLogOutReq)
+	httpsvr.JsonBodyDecode(c, req)
+	var token = req.Token
 
 	var ret = new(httpsvr.Resp)
 	if len(token) == 0 {

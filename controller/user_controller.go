@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"fmt"
 	"midgo/httpsvr"
 
+	"midnightapisvr/comm"
 	"midnightapisvr/service"
 )
 
@@ -10,11 +12,20 @@ import (
 type UserController struct{}
 
 // UserRegister 用户注册
+// [POST] /midnightapisvr/api/user/userregister
+// Request Body (application/json) {
+//     username: "guest123",
+//     nickname: "john",
+//     password: "guest123#",
+// }
 func (*UserController) UserRegister(c *httpsvr.Req) *httpsvr.Resp {
-	c.ParseForm()
-	username := c.FormValue("username")
-	password := c.FormValue("password")
-	nickname := c.FormValue("nickname")
+	var req = new(comm.UserRegisterReq)
+	httpsvr.JsonBodyDecode(c, req)
+	fmt.Println(req)
+
+	var username = req.Username
+	var password = req.Password
+	var nickname = req.Nickname
 
 	var ret = new(httpsvr.Resp)
 	if len(username) < 6 || len(password) < 6 || len(nickname) == 0 {
@@ -39,6 +50,8 @@ func (*UserController) UserRegister(c *httpsvr.Req) *httpsvr.Resp {
 }
 
 // GetUserInfo 获取用户信息
+// [GET] /midnightapisvr/api/user/getuserinfo
+// :param token: 登录时候得到的 token
 func (*UserController) GetUserInfo(c *httpsvr.Req) *httpsvr.Resp {
 	c.ParseForm()
 	token := c.FormValue("token")
