@@ -1,5 +1,31 @@
 package comm
 
+type UserRegisterReq struct {
+	Username string `json:"username"`
+	Nickname string `json:"nickname"`
+	Password string `json:"password"`
+}
+
+type UserLogInReq struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type UserLogOutReq struct {
+	Token string `json:"token"`
+}
+
+type MsgAckReq struct {
+	Token string `json:"token"`
+	Sid   int    `json:"sid"`
+}
+
+type ChoiceReq struct {
+	Token  string `json:"token"`
+	Sid    int    `json:"sid"`
+	Option int    `json:"option"`
+}
+
 type UserInfoRes struct {
 	Username  string `json:"username"`
 	Nickname  string `json:"nickname"`
