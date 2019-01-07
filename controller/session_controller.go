@@ -2,6 +2,8 @@ package controller
 
 import (
 	"midgo/httpsvr"
+	"midgo/logger"
+
 	"midnightapisvr/comm"
 	"midnightapisvr/service"
 )
@@ -18,28 +20,42 @@ type SessionController struct{}
 func (*SessionController) UserLogIn(c *httpsvr.Req) *httpsvr.Resp {
 	var req = new(comm.UserLogInReq)
 	httpsvr.JsonBodyDecode(c, req)
-
 	var username = req.Username
 	var password = req.Password
+	logger.Info(":param username: %s", username)
 
 	var ret = new(httpsvr.Resp)
 	if len(username) == 0 || len(password) == 0 {
-		ret.SetRtn(400)
-		ret.SetMsg("param error")
+		var rtn = 0
+		var msg = "param error, need username and password"
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
 	var sessionSvc = new(service.SessionService)
 	sessionInfo, err := sessionSvc.UserLogIn(username, password)
 	if err != nil {
-		ret.SetRtn(403)
-		ret.SetMsg(err.Error())
+		var rtn = 403
+		var msg = err.Error()
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
-	ret.SetRtn(0)
-	ret.SetMsg("okay")
+	var rtn = 0
+	var msg = "okay"
+	ret.SetRtn(rtn)
+	ret.SetMsg(msg)
 	ret.SetData(sessionInfo)
+	logger.Info("%d: %s", rtn, msg)
+
 	return ret
 }
 
@@ -52,23 +68,38 @@ func (*SessionController) UserLogOut(c *httpsvr.Req) *httpsvr.Resp {
 	var req = new(comm.UserLogOutReq)
 	httpsvr.JsonBodyDecode(c, req)
 	var token = req.Token
+	logger.Info(":param token: %s", token)
 
 	var ret = new(httpsvr.Resp)
 	if len(token) == 0 {
-		ret.SetRtn(403)
-		ret.SetMsg("permission denied: need token")
+		var rtn = 403
+		var msg = "permission denied: need token"
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
 	var sessionSvc = new(service.SessionService)
 	err := sessionSvc.UserLogOut(token)
 	if err != nil {
-		ret.SetRtn(500)
-		ret.SetMsg(err.Error())
+		var rtn = 500
+		var msg = err.Error()
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
-	ret.SetRtn(0)
-	ret.SetMsg("logout successfully")
+	var rtn = 0
+	var msg = "logout successfully"
+	ret.SetRtn(rtn)
+	ret.SetMsg(msg)
+	logger.Info("%d: %s", rtn, msg)
+
 	return ret
 }

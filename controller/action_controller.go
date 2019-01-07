@@ -2,6 +2,7 @@ package controller
 
 import (
 	"midgo/httpsvr"
+	"midgo/logger"
 
 	"midnightapisvr/comm"
 	"midnightapisvr/service"
@@ -15,33 +16,53 @@ type ActionController struct{}
 func (*ActionController) GetCurrentAction(c *httpsvr.Req) *httpsvr.Resp {
 	c.ParseForm()
 	token := c.FormValue("token")
+	logger.Info(":param token: %s", token)
 
 	var ret = new(httpsvr.Resp)
 	if len(token) == 0 {
-		ret.SetRtn(403)
-		ret.SetMsg("permission denied: need token")
+		var rtn = 403
+		var msg = "permission denied: need token"
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
 	var sessionSvc = new(service.SessionService)
 	uid, err := sessionSvc.GetUidByToken(token)
 	if err != nil || uid <= 0 {
-		ret.SetRtn(403)
-		ret.SetMsg("permission denied: invalid token")
+		var rtn = 403
+		var msg = "permission denied: invalid token"
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
 	var actionSvc = new(service.ActionService)
 	actionInfo, err := actionSvc.GetCurrentAction(uid)
 	if err != nil {
-		ret.SetRtn(500)
-		ret.SetMsg(err.Error())
+		var rtn = 500
+		var msg = err.Error()
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
-	ret.SetRtn(0)
-	ret.SetMsg("okay")
+	var rtn = 0
+	var msg = "okay"
+	ret.SetRtn(rtn)
+	ret.SetMsg(msg)
 	ret.SetData(actionInfo)
+	logger.Info("%d: %s", rtn, msg)
+
 	return ret
 }
 
@@ -56,32 +77,53 @@ func (*ActionController) NormalMsgACK(c *httpsvr.Req) *httpsvr.Resp {
 	httpsvr.JsonBodyDecode(c, req)
 	var token = req.Token
 	var sid = req.Sid
+	logger.Info(":param token: %s", token)
+	logger.Info(":param sid: %d", sid)
 
 	var ret = new(httpsvr.Resp)
 	if len(token) == 0 {
-		ret.SetRtn(403)
-		ret.SetMsg("permission denied: need token")
+		var rtn = 403
+		var msg = "permission denied: need token"
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
 	var sessionSvc = new(service.SessionService)
 	uid, err := sessionSvc.GetUidByToken(token)
 	if err != nil || uid <= 0 {
-		ret.SetRtn(403)
-		ret.SetMsg("permission denied: invalid token")
+		var rtn = 403
+		var msg = "permission denied: invalid token"
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
 	var actionSvc = new(service.ActionService)
 	err = actionSvc.ConfirmUpdateProcess(uid, sid)
 	if err != nil {
-		ret.SetRtn(500)
-		ret.SetMsg(err.Error())
+		var rtn = 500
+		var msg = err.Error()
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
-	ret.SetRtn(0)
-	ret.SetMsg("ack recieved :-)")
+	var rtn = 0
+	var msg = "ack recieved :-)"
+	ret.SetRtn(rtn)
+	ret.SetMsg(msg)
+	logger.Info("%d: %s", rtn, msg)
+
 	return ret
 }
 
@@ -98,37 +140,64 @@ func (*ActionController) MakeChoice(c *httpsvr.Req) *httpsvr.Resp {
 	var token = req.Token
 	var sid = req.Sid
 	var option = req.Option
+	logger.Info(":param token: %s", token)
+	logger.Info(":param sid: %d", sid)
+	logger.Info(":param option: %d", option)
 
 	var ret = new(httpsvr.Resp)
 	if len(token) == 0 {
-		ret.SetRtn(403)
-		ret.SetMsg("permission denied: need token")
+		var rtn = 403
+		var msg = "permission denied: need token"
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
 	if option != comm.LCHOOSE && option != comm.RCHOOSE {
-		ret.SetRtn(400)
-		ret.SetMsg("param error: invalid option")
+		var rtn = 400
+		var msg = "param error: invalid option"
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
 	var sessionSvc = new(service.SessionService)
 	uid, err := sessionSvc.GetUidByToken(token)
 	if err != nil || uid <= 0 {
-		ret.SetRtn(403)
-		ret.SetMsg("permission denied: invalid token")
+		var rtn = 403
+		var msg = "permission denied: invalid token"
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
 	var actionSvc = new(service.ActionService)
 	err = actionSvc.ChooseUpdateProcess(uid, sid, option)
 	if err != nil {
-		ret.SetRtn(500)
-		ret.SetMsg(err.Error())
+		var rtn = 500
+		var msg = err.Error()
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
-	ret.SetRtn(0)
-	ret.SetMsg("recieve ack :-)")
+	var rtn = 0
+	var msg = "ack recieved :-)"
+	ret.SetRtn(rtn)
+	ret.SetMsg(msg)
+	logger.Info("%d: %s", rtn, msg)
+
 	return ret
 }

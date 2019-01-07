@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"fmt"
 	"midgo/httpsvr"
+	"midgo/logger"
 
 	"midnightapisvr/comm"
 	"midnightapisvr/service"
@@ -21,16 +21,22 @@ type UserController struct{}
 func (*UserController) UserRegister(c *httpsvr.Req) *httpsvr.Resp {
 	var req = new(comm.UserRegisterReq)
 	httpsvr.JsonBodyDecode(c, req)
-	fmt.Println(req)
 
 	var username = req.Username
 	var password = req.Password
 	var nickname = req.Nickname
+	logger.Info(":param username: %s", username)
+	logger.Info(":param nickname: %s", nickname)
 
 	var ret = new(httpsvr.Resp)
 	if len(username) < 6 || len(password) < 6 || len(nickname) == 0 {
-		ret.SetRtn(400)
-		ret.SetMsg("param error, check if username, password length < 6")
+		var rtn = 400
+		var msg = "param error, check if username, password length < 6"
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
@@ -38,14 +44,24 @@ func (*UserController) UserRegister(c *httpsvr.Req) *httpsvr.Resp {
 	const AVATAR_URI = "/midnightstatic/images/avatar_default.jpg"
 	userInfo, err := userSvc.UserRegister(username, nickname, password, AVATAR_URI)
 	if err != nil {
-		ret.SetRtn(500)
-		ret.SetMsg(err.Error())
+		var rtn = 500
+		var msg = err.Error()
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
-	ret.SetRtn(0)
-	ret.SetMsg("okay")
+	var rtn = 0
+	var msg = "okay"
+
+	ret.SetRtn(rtn)
+	ret.SetMsg(msg)
 	ret.SetData(userInfo)
+	logger.Info("%d: %s", rtn, msg)
+
 	return ret
 }
 
@@ -55,33 +71,52 @@ func (*UserController) UserRegister(c *httpsvr.Req) *httpsvr.Resp {
 func (*UserController) GetUserInfo(c *httpsvr.Req) *httpsvr.Resp {
 	c.ParseForm()
 	token := c.FormValue("token")
+	logger.Info(":param token: %s", token)
 
 	var ret = new(httpsvr.Resp)
 	if len(token) == 0 {
-		ret.SetRtn(403)
-		ret.SetMsg("permission denied: need token")
+		var rtn = 403
+		var msg = "permission denied: need token"
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
 	var sessionSvc = new(service.SessionService)
 	uid, err := sessionSvc.GetUidByToken(token)
 	if err != nil || uid <= 0 {
-		ret.SetRtn(403)
-		ret.SetMsg("permission denied: invalid token")
+		var rtn = 403
+		var msg = "permission denied: invalid token"
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
 	var userSvc = new(service.UserService)
 	userInfo, err := userSvc.GetUserInfo(uid)
 	if err != nil {
-		ret.SetRtn(500)
-		ret.SetMsg(err.Error())
+		var rtn = 500
+		var msg = err.Error()
+
+		ret.SetRtn(rtn)
+		ret.SetMsg(msg)
+		logger.Error("%d: %s", rtn, msg)
+
 		return ret
 	}
 
-	ret.SetRtn(0)
-	ret.SetMsg("okay")
+	var rtn = 0
+	var msg = "okay"
+	ret.SetRtn(rtn)
+	ret.SetMsg(msg)
 	ret.SetData(userInfo)
+	logger.Info("%d: %s", rtn, msg)
 
 	return ret
 }

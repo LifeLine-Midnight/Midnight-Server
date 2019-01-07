@@ -2,6 +2,7 @@ package main
 
 import (
 	"midgo/httpsvr"
+	"midgo/logger"
 
 	"midnightapisvr/controller"
 )
@@ -12,6 +13,7 @@ const (
 )
 
 func main() {
+	logger.SetLogPath("/home/ubuntu/log/midnightapisvr.log")
 	svr := httpsvr.GetMidgoSvr()
 	svr.AddController("/midnightapisvr/api", new(controller.UserController))
 	svr.AddController("/midnightapisvr/api", new(controller.SessionController))
